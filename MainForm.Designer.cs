@@ -36,6 +36,11 @@
             this.panel1 = new System.Windows.Forms.Panel();
             this.processedImgBox = new System.Windows.Forms.PictureBox();
             this.panel2 = new System.Windows.Forms.Panel();
+            this.resultLabel = new System.Windows.Forms.Label();
+            this.label6 = new System.Windows.Forms.Label();
+            this.percentLabel = new System.Windows.Forms.Label();
+            this.label5 = new System.Windows.Forms.Label();
+            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label2 = new System.Windows.Forms.Label();
             this.tresholdTrackBar = new System.Windows.Forms.TrackBar();
             this.label4 = new System.Windows.Forms.Label();
@@ -48,7 +53,6 @@
             this.ProcessButton = new System.Windows.Forms.Button();
             this.PlayButton = new System.Windows.Forms.Button();
             this.resolutionsBox = new System.Windows.Forms.ComboBox();
-            this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.originalImageBox)).BeginInit();
             this.panel1.SuspendLayout();
@@ -104,7 +108,7 @@
             // 
             // originalImageBox
             // 
-            this.originalImageBox.Location = new System.Drawing.Point(6, 12);
+            this.originalImageBox.Location = new System.Drawing.Point(6, 13);
             this.originalImageBox.Name = "originalImageBox";
             this.originalImageBox.Size = new System.Drawing.Size(500, 500);
             this.originalImageBox.TabIndex = 1;
@@ -117,21 +121,24 @@
             this.panel1.Controls.Add(this.processedImgBox);
             this.panel1.Location = new System.Drawing.Point(519, 12);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(445, 445);
+            this.panel1.Size = new System.Drawing.Size(500, 500);
             this.panel1.TabIndex = 12;
             // 
             // processedImgBox
             // 
-            this.processedImgBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.processedImgBox.Location = new System.Drawing.Point(0, 0);
+            this.processedImgBox.Location = new System.Drawing.Point(-1, -2);
             this.processedImgBox.Name = "processedImgBox";
-            this.processedImgBox.Size = new System.Drawing.Size(441, 441);
+            this.processedImgBox.Size = new System.Drawing.Size(500, 500);
             this.processedImgBox.TabIndex = 0;
             this.processedImgBox.TabStop = false;
             // 
             // panel2
             // 
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panel2.Controls.Add(this.resultLabel);
+            this.panel2.Controls.Add(this.label6);
+            this.panel2.Controls.Add(this.percentLabel);
+            this.panel2.Controls.Add(this.label5);
             this.panel2.Controls.Add(this.checkBox1);
             this.panel2.Controls.Add(this.label2);
             this.panel2.Controls.Add(this.tresholdTrackBar);
@@ -139,15 +146,62 @@
             this.panel2.Controls.Add(this.label3);
             this.panel2.Controls.Add(this.marginTrackBar);
             this.panel2.Controls.Add(this.borderTrackBar);
-            this.panel2.Location = new System.Drawing.Point(519, 463);
+            this.panel2.Location = new System.Drawing.Point(519, 528);
             this.panel2.Name = "panel2";
-            this.panel2.Size = new System.Drawing.Size(442, 202);
+            this.panel2.Size = new System.Drawing.Size(442, 137);
             this.panel2.TabIndex = 18;
+            // 
+            // resultLabel
+            // 
+            this.resultLabel.AutoSize = true;
+            this.resultLabel.Location = new System.Drawing.Point(320, 148);
+            this.resultLabel.Name = "resultLabel";
+            this.resultLabel.Size = new System.Drawing.Size(43, 13);
+            this.resultLabel.TabIndex = 28;
+            this.resultLabel.Text = "Ничего";
+            // 
+            // label6
+            // 
+            this.label6.AutoSize = true;
+            this.label6.Location = new System.Drawing.Point(167, 148);
+            this.label6.Name = "label6";
+            this.label6.Size = new System.Drawing.Size(146, 13);
+            this.label6.TabIndex = 27;
+            this.label6.Text = "Нейросеть думает, что это:";
+            // 
+            // percentLabel
+            // 
+            this.percentLabel.AutoSize = true;
+            this.percentLabel.Location = new System.Drawing.Point(320, 177);
+            this.percentLabel.Name = "percentLabel";
+            this.percentLabel.Size = new System.Drawing.Size(33, 13);
+            this.percentLabel.TabIndex = 26;
+            this.percentLabel.Text = "146%";
+            // 
+            // label5
+            // 
+            this.label5.AutoSize = true;
+            this.label5.Location = new System.Drawing.Point(167, 177);
+            this.label5.Name = "label5";
+            this.label5.Size = new System.Drawing.Size(138, 13);
+            this.label5.TabIndex = 25;
+            this.label5.Text = "Точность распознавания:";
+            // 
+            // checkBox1
+            // 
+            this.checkBox1.AutoSize = true;
+            this.checkBox1.Location = new System.Drawing.Point(174, 91);
+            this.checkBox1.Name = "checkBox1";
+            this.checkBox1.Size = new System.Drawing.Size(86, 17);
+            this.checkBox1.TabIndex = 24;
+            this.checkBox1.Text = "Обработать";
+            this.checkBox1.UseVisualStyleBackColor = true;
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
             // 
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(56, 98);
+            this.label2.Location = new System.Drawing.Point(56, 72);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(38, 13);
             this.label2.TabIndex = 23;
@@ -156,7 +210,7 @@
             // tresholdTrackBar
             // 
             this.tresholdTrackBar.LargeChange = 1;
-            this.tresholdTrackBar.Location = new System.Drawing.Point(7, 133);
+            this.tresholdTrackBar.Location = new System.Drawing.Point(7, 91);
             this.tresholdTrackBar.Maximum = 255;
             this.tresholdTrackBar.Name = "tresholdTrackBar";
             this.tresholdTrackBar.Size = new System.Drawing.Size(140, 45);
@@ -234,7 +288,7 @@
             this.controlPanel.Enabled = false;
             this.controlPanel.Location = new System.Drawing.Point(520, 672);
             this.controlPanel.Name = "controlPanel";
-            this.controlPanel.Size = new System.Drawing.Size(444, 59);
+            this.controlPanel.Size = new System.Drawing.Size(441, 59);
             this.controlPanel.TabIndex = 33;
             // 
             // ProcessButton
@@ -245,8 +299,9 @@
             this.ProcessButton.Name = "ProcessButton";
             this.ProcessButton.Size = new System.Drawing.Size(125, 30);
             this.ProcessButton.TabIndex = 26;
-            this.ProcessButton.Text = "Обработать";
+            this.ProcessButton.Text = "Распознать";
             this.ProcessButton.UseVisualStyleBackColor = true;
+            this.ProcessButton.Click += new System.EventHandler(this.ProcessButton_Click);
             // 
             // PlayButton
             // 
@@ -256,8 +311,9 @@
             this.PlayButton.Name = "PlayButton";
             this.PlayButton.Size = new System.Drawing.Size(125, 30);
             this.PlayButton.TabIndex = 25;
-            this.PlayButton.Text = "Играть";
+            this.PlayButton.Text = "Обучить";
             this.PlayButton.UseVisualStyleBackColor = true;
+            this.PlayButton.Click += new System.EventHandler(this.PlayButton_Click);
             // 
             // resolutionsBox
             // 
@@ -269,22 +325,11 @@
             this.resolutionsBox.Size = new System.Drawing.Size(218, 21);
             this.resolutionsBox.TabIndex = 34;
             // 
-            // checkBox1
-            // 
-            this.checkBox1.AutoSize = true;
-            this.checkBox1.Location = new System.Drawing.Point(174, 91);
-            this.checkBox1.Name = "checkBox1";
-            this.checkBox1.Size = new System.Drawing.Size(86, 17);
-            this.checkBox1.TabIndex = 24;
-            this.checkBox1.Text = "Обработать";
-            this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(973, 742);
+            this.ClientSize = new System.Drawing.Size(1097, 742);
             this.Controls.Add(this.resolutionsBox);
             this.Controls.Add(this.controlPanel);
             this.Controls.Add(this.ticksLabel);
@@ -338,6 +383,10 @@
         private System.Windows.Forms.PictureBox processedImgBox;
         private System.Windows.Forms.ComboBox resolutionsBox;
         private System.Windows.Forms.CheckBox checkBox1;
+        private System.Windows.Forms.Label resultLabel;
+        private System.Windows.Forms.Label label6;
+        private System.Windows.Forms.Label percentLabel;
+        private System.Windows.Forms.Label label5;
     }
 }
 

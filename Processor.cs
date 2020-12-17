@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Linq;
 
 namespace AForge.WindowsForms
 {
@@ -80,9 +81,11 @@ namespace AForge.WindowsForms
         public Settings settings = new Settings();
 
 
+        BaseNetwork ourNetwork;
 
         public MagicEye()
         {
+            ourNetwork = new NeuralNetwork(new int[] { 1000, 3000, 500, 5 });
         }
 
         public bool ProcessImage(Bitmap bitmap)
@@ -133,8 +136,8 @@ namespace AForge.WindowsForms
             original = scaleFilter.Apply(original);
             g = Graphics.FromImage(original);
             //  Пороговый фильтр применяем. Величина порога берётся из настроек, и меняется на форме
-            AForge.Imaging.Filters.BradleyLocalThresholding threshldFilter = new AForge.Imaging.Filters.BradleyLocalThresholding();
-            threshldFilter.PixelBrightnessDifferenceLimit = settings.differenceLim;
+            AForge.Imaging.Filters.Threshold threshldFilter = new AForge.Imaging.Filters.Threshold();
+            threshldFilter.ThresholdValue = settings.threshold;
             threshldFilter.ApplyInPlace(uProcessed);
 
 
@@ -221,6 +224,43 @@ namespace AForge.WindowsForms
             unmanaged = scaleFilter.Apply(unmanaged);
 
             return rez;
+        }
+
+        public FigureType PredictImage(Bitmap image)
+        {
+            //ProcessImage(image);
+            var sample = CreateSample(FigureType.UNDEF);
+            return ourNetwork.Predict(sample);
+        }
+
+        private Sample CreateSample(FigureType actualType = FigureType.UNDEF)
+        {            
+            var inputs = new double[1000];
+            for (int i = 0; i < 500; i++)
+            {
+                inputs[i] = CountBlackPixels(GetBitmapColumn(processed, i));
+                inputs[i + 500] = CountBlackPixels(GetBitmapRow(processed, i));
+            }
+            return new Sample(inputs, 5, actualType);
+        }
+
+        private int CountBlackPixels(Color[] pixels) =>
+            pixels.Count(p => p.R < 0.1 && p.G < 0.1 && p.B < 0.1);
+
+        private Color[] GetBitmapColumn(Bitmap picture, int ind)
+        {
+            var result = new Color[picture.Height];
+            for (int i = 0; i < picture.Height; i++)            
+                result[i] = picture.GetPixel(ind, i);
+            return result;
+        }
+
+        private Color[] GetBitmapRow(Bitmap picture, int ind)
+        {
+            var result = new Color[picture.Width];
+            for (int i = 0; i < picture.Width; i++)
+                result[i] = picture.GetPixel(i, ind);
+            return result;
         }
 
     }

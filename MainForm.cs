@@ -38,6 +38,8 @@ namespace AForge.WindowsForms
         /// Выбранное устройство для видео
         /// </summary>
         private IVideoSource videoSource;
+
+        private Bitmap currentImage;
         
         /// <summary>
         /// Таймер для измерения производительности (времени на обработку кадра)
@@ -48,6 +50,7 @@ namespace AForge.WindowsForms
         /// Таймер для обновления объектов интерфейса
         /// </summary>
         System.Threading.Timer updateTmr;
+        
 
         /// <summary>
         /// Функция обновления формы, тут же происходит анализ текущего этапа, и при необходимости переключение на следующий
@@ -96,7 +99,7 @@ namespace AForge.WindowsForms
             {
                 MessageBox.Show("А нет у вас камеры!", "Ошибочка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            controller = new Controller(new FormUpdateDelegate(UpdateFormFields));
+            controller = new Controller(new FormUpdateDelegate(UpdateFormFields));            
 //            updateTmr = new System.Threading.Timer(Tick, evnt, 500, 100);
         }
 
@@ -106,10 +109,13 @@ namespace AForge.WindowsForms
             sw.Restart();
 
             //  Отправляем изображение на обработку, и выводим оригинал (с раскраской) и разрезанные изображения
-            if(controller.Ready)
-                
+            if (controller.Ready)
+
                 #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                controller.ProcessImage((Bitmap)eventArgs.Frame.Clone());
+                // currentImage = (Bitmap)eventArgs.Frame.Clone();
+                currentImage = new Bitmap(@"..\..\Images\forward\forward2.jpg");
+                controller.ProcessImage(currentImage);
+                
                 #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
                 //  Это выкинуть в отдельный поток!
@@ -203,6 +209,16 @@ namespace AForge.WindowsForms
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
         {
             controller.settings.processImg = checkBox1.Checked;
+        }
+
+        private void ProcessButton_Click(object sender, EventArgs e)
+        {
+            Console.WriteLine(controller.processor.PredictImage(currentImage));
+        }
+
+        private void PlayButton_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

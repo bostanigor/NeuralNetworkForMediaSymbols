@@ -50,7 +50,8 @@ namespace AForge.WindowsForms
         /// Таймер для обновления объектов интерфейса
         /// </summary>
         System.Threading.Timer updateTmr;
-        
+
+        SamplesSet samplesSet = new SamplesSet(); 
 
         /// <summary>
         /// Функция обновления формы, тут же происходит анализ текущего этапа, и при необходимости переключение на следующий
@@ -101,6 +102,23 @@ namespace AForge.WindowsForms
             }
             controller = new Controller(new FormUpdateDelegate(UpdateFormFields));            
 //            updateTmr = new System.Threading.Timer(Tick, evnt, 500, 100);
+
+            var directory = "";
+            for ()
+            {
+                var image = controller.processor.getProcessedImage(new Bitmap(directory));
+                var input = new int[1000];
+                for (var i = 0; i < 500; i++)
+                for (var j = 0; j < 500; j++)
+                {
+                    if (image.GetPixel(i, j) == Color.Black)
+                    {
+                        input[i]++;
+                        input[i + 500]++;
+                    }
+                }
+                samplesSet.AddSample(new Sample());
+            }
         }
 
         private void video_NewFrame(object sender, NewFrameEventArgs eventArgs)

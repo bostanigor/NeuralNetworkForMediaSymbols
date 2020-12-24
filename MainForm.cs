@@ -240,7 +240,9 @@ namespace AForge.WindowsForms
 
         private void ProcessButton_Click(object sender, EventArgs e)
         {
-            Console.WriteLine(controller.processor.PredictImage(currentImage));
+            var result = controller.processor.PredictImage(currentImage);
+            Console.WriteLine(result);
+            resultLabel.Text = result.ToString();
         }
 
         private void PlayButton_Click(object sender, EventArgs e)

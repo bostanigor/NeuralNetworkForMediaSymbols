@@ -52,7 +52,7 @@ namespace AForge.WindowsForms
         /// </summary>
         System.Threading.Timer updateTmr;
 
-        private NeuralNetwork neuralNetwork = new NeuralNetwork(new []{1000,500,20,2});
+        private NeuralNetwork neuralNetwork = new NeuralNetwork(new []{1000,3000,100,5});
         private SamplesSet samplesSet = new SamplesSet();
 
         /// <summary>
@@ -105,9 +105,10 @@ namespace AForge.WindowsForms
             }
 
             controller = new Controller(new FormUpdateDelegate(UpdateFormFields));
-//            updateTmr = new System.Threading.Timer(Tick, evnt, 500, 100);
+            //            updateTmr = new System.Threading.Timer(Tick, evnt, 500, 100);
 
             samplesSet = controller.processor.CreateSamplesSet();
+            Console.WriteLine("SAMPLE SET CREATED");
             neuralNetwork.TrainOnDataSet(samplesSet, 20, 50);
         }
 

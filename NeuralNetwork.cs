@@ -331,12 +331,14 @@ namespace AForge.WindowsForms
         public override double TrainOnDataSet(SamplesSet samplesSet, int epochs_count, double acceptable_erorr,
             bool parallel = true)
         {
+            Random rnd = new Random();
+            var randomSamples = samplesSet.samples.OrderBy(x => rnd.Next());
             var stopWatch = new Stopwatch();
             stopWatch.Restart();
             var guessLevel = 0.0;
             for (int i = 1; i <= epochs_count; i++)
             {
-                foreach (var sample in samplesSet)
+                foreach (var sample in randomSamples)
                     if (Train((Sample) sample) == 0)
                         guessLevel += 1;
                 guessLevel /= samplesSet.samples.Count;

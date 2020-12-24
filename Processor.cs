@@ -117,8 +117,8 @@ namespace AForge.WindowsForms
             side -= 2 * settings.border;
 
             //  Мы сейчас занимаемся тем, что красиво оформляем входной кадр, чтобы вывести его на форму
-            Rectangle cropRect = new Rectangle((bitmap.Width - bitmap.Height) / 2 + settings.left + settings.border,
-                settings.top + settings.border, side, side);
+            Rectangle cropRect = new Rectangle((bitmap.Width - bitmap.Height),
+               0, side, side);
 
             //  Тут создаём новый битмапчик, который будет исходным изображением
             original = new Bitmap(cropRect.Width, cropRect.Height);
@@ -307,11 +307,14 @@ namespace AForge.WindowsForms
             return result;
         }
         
-        private void ProcessClassSamples(SamplesSet samplesSet, string[] filenames, FigureType type)
+        private void ProcessClassSamples(SamplesSet samplesSet, string[] fileNames, FigureType type)
         {
-            foreach (var fileName in filenames)
-            {
+            foreach (var fileName in fileNames.Take(5))
+            {                
                 var image = getProcessedImage(new Bitmap(fileName));
+                var newPath = fileName.Split('\\');
+                newPath[newPath.Length - 1] = "processed_" + newPath.Last();
+                image.Save(String.Join("\\", newPath));
                 var inputs = new double[1000];
                 for (int i = 0; i < 500; i++)
                 {
@@ -319,6 +322,7 @@ namespace AForge.WindowsForms
                     inputs[i + 500] = CountBlackPixels(GetBitmapRow(image, i));
                 }
                 samplesSet.AddSample(new Sample(inputs, 5, type));
+                Console.WriteLine($"Add sample {fileName}");
             }
         }
         

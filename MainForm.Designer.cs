@@ -135,10 +135,6 @@
             // panel2
             // 
             this.panel2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.panel2.Controls.Add(this.resultLabel);
-            this.panel2.Controls.Add(this.label6);
-            this.panel2.Controls.Add(this.percentLabel);
-            this.panel2.Controls.Add(this.label5);
             this.panel2.Controls.Add(this.checkBox1);
             this.panel2.Controls.Add(this.label2);
             this.panel2.Controls.Add(this.tresholdTrackBar);
@@ -154,7 +150,7 @@
             // resultLabel
             // 
             this.resultLabel.AutoSize = true;
-            this.resultLabel.Location = new System.Drawing.Point(320, 148);
+            this.resultLabel.Location = new System.Drawing.Point(164, 652);
             this.resultLabel.Name = "resultLabel";
             this.resultLabel.Size = new System.Drawing.Size(43, 13);
             this.resultLabel.TabIndex = 28;
@@ -163,7 +159,7 @@
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(167, 148);
+            this.label6.Location = new System.Drawing.Point(12, 652);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(146, 13);
             this.label6.TabIndex = 27;
@@ -172,7 +168,7 @@
             // percentLabel
             // 
             this.percentLabel.AutoSize = true;
-            this.percentLabel.Location = new System.Drawing.Point(320, 177);
+            this.percentLabel.Location = new System.Drawing.Point(164, 672);
             this.percentLabel.Name = "percentLabel";
             this.percentLabel.Size = new System.Drawing.Size(33, 13);
             this.percentLabel.TabIndex = 26;
@@ -181,7 +177,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(167, 177);
+            this.label5.Location = new System.Drawing.Point(12, 672);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(138, 13);
             this.label5.TabIndex = 25;
@@ -330,7 +326,11 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1097, 742);
+            this.Controls.Add(this.percentLabel);
+            this.Controls.Add(this.resultLabel);
+            this.Controls.Add(this.label5);
             this.Controls.Add(this.resolutionsBox);
+            this.Controls.Add(this.label6);
             this.Controls.Add(this.controlPanel);
             this.Controls.Add(this.ticksLabel);
             this.Controls.Add(this.statusLabel);

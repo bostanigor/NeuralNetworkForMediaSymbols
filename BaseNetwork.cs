@@ -15,7 +15,8 @@ namespace AForge.WindowsForms
 
         public abstract int Train(Sample sample, bool parallel = true);
 
-        public abstract double TrainOnDataSet(SamplesSet samplesSet, int epochs_count, double acceptable_erorr, bool parallel = true);
+        public abstract double TrainOnDataSet(SamplesSet samplesSet, int epochs_count, double acceptable_erorr,
+            bool parallel = true);
 
         public abstract FigureType Predict(Sample sample);
 

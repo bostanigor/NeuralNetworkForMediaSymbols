@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using AForge.Video;
 using AForge.Video.DirectShow;
 using System.Diagnostics;
+using System.IO;
 using System.IO.Ports;
 
 namespace AForge.WindowsForms
@@ -28,30 +29,31 @@ namespace AForge.WindowsForms
         /// Событие для синхронизации таймера
         /// </summary>
         private AutoResetEvent evnt = new AutoResetEvent(false);
-                
+
         /// <summary>
         /// Список устройств для снятия видео (веб-камер)
         /// </summary>
         private FilterInfoCollection videoDevicesList;
-        
+
         /// <summary>
         /// Выбранное устройство для видео
         /// </summary>
         private IVideoSource videoSource;
 
         private Bitmap currentImage;
-        
+
         /// <summary>
         /// Таймер для измерения производительности (времени на обработку кадра)
         /// </summary>
         private Stopwatch sw = new Stopwatch();
-        
+
         /// <summary>
         /// Таймер для обновления объектов интерфейса
         /// </summary>
         System.Threading.Timer updateTmr;
 
-        SamplesSet samplesSet = new SamplesSet(); 
+        private NeuralNetwork neuralNetwork = new NeuralNetwork(new []{1000,500,20,2});
+        private SamplesSet samplesSet = new SamplesSet();
 
         /// <summary>
         /// Функция обновления формы, тут же происходит анализ текущего этапа, и при необходимости переключение на следующий
@@ -92,6 +94,7 @@ namespace AForge.WindowsForms
             {
                 cmbVideoSource.Items.Add(videoDevice.Name);
             }
+
             if (cmbVideoSource.Items.Count > 0)
             {
                 cmbVideoSource.SelectedIndex = 0;
@@ -100,25 +103,12 @@ namespace AForge.WindowsForms
             {
                 MessageBox.Show("А нет у вас камеры!", "Ошибочка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-            controller = new Controller(new FormUpdateDelegate(UpdateFormFields));            
+
+            controller = new Controller(new FormUpdateDelegate(UpdateFormFields));
 //            updateTmr = new System.Threading.Timer(Tick, evnt, 500, 100);
 
-            var directory = "";
-            for ()
-            {
-                var image = controller.processor.getProcessedImage(new Bitmap(directory));
-                var input = new int[1000];
-                for (var i = 0; i < 500; i++)
-                for (var j = 0; j < 500; j++)
-                {
-                    if (image.GetPixel(i, j) == Color.Black)
-                    {
-                        input[i]++;
-                        input[i + 500]++;
-                    }
-                }
-                samplesSet.AddSample(new Sample());
-            }
+            samplesSet = controller.processor.CreateSamplesSet();
+            neuralNetwork.TrainOnDataSet(samplesSet, 20, 50);
         }
 
         private void video_NewFrame(object sender, NewFrameEventArgs eventArgs)
@@ -128,20 +118,19 @@ namespace AForge.WindowsForms
 
             //  Отправляем изображение на обработку, и выводим оригинал (с раскраской) и разрезанные изображения
             if (controller.Ready)
+#pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+                currentImage = (Bitmap)eventArgs.Frame.Clone();
+//                currentImage = new Bitmap(@"..\..\Images\forward\forward2.jpg");
+            controller.ProcessImage(currentImage);
 
-                #pragma warning disable CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
-                // currentImage = (Bitmap)eventArgs.Frame.Clone();
-                currentImage = new Bitmap(@"..\..\Images\forward\forward2.jpg");
-                controller.ProcessImage(currentImage);
-                
-                #pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
+#pragma warning restore CS4014 // Because this call is not awaited, execution of the current method continues before the call is completed
 
-                //  Это выкинуть в отдельный поток!
-                //  И отдать делегат? Или просто проверять значение переменной?
-                //  Тут хрень какая-то
+            //  Это выкинуть в отдельный поток!
+            //  И отдать делегат? Или просто проверять значение переменной?
+            //  Тут хрень какая-то
 
-                //currentState = Stage.Thinking;
-                //sage.solveState(processor.currentDeskState, 16, 7);
+            //currentState = Stage.Thinking;
+            //sage.solveState(processor.currentDeskState, 16, 7);
         }
 
         private void btnStart_Click(object sender, EventArgs e)
@@ -166,6 +155,7 @@ namespace AForge.WindowsForms
                 {
                     originalImageBox.Image.Dispose();
                 }
+
                 videoSource = null;
                 StartButton.Text = "Старт";
                 controlPanel.Enabled = false;
@@ -175,8 +165,8 @@ namespace AForge.WindowsForms
 
         private void tresholdTrackBar_ValueChanged(object sender, EventArgs e)
         {
-            controller.settings.threshold = (byte)tresholdTrackBar.Value;
-            controller.settings.differenceLim = (float)tresholdTrackBar.Value/tresholdTrackBar.Maximum;
+            controller.settings.threshold = (byte) tresholdTrackBar.Value;
+            controller.settings.differenceLim = (float) tresholdTrackBar.Value / tresholdTrackBar.Maximum;
         }
 
         private void borderTrackBar_ValueChanged(object sender, EventArgs e)
@@ -204,14 +194,32 @@ namespace AForge.WindowsForms
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            switch(e.KeyCode)
+            switch (e.KeyCode)
             {
-                case Keys.W: controller.settings.decTop(); Debug.WriteLine("Up!"); break;
-                case Keys.S: controller.settings.incTop(); Debug.WriteLine("Down!"); break;
-                case Keys.A: controller.settings.decLeft(); Debug.WriteLine("Left!"); break;
-                case Keys.D: controller.settings.incLeft(); Debug.WriteLine("Right!"); break;
-                case Keys.Q: controller.settings.border++; Debug.WriteLine("Plus!"); break;
-                case Keys.E: controller.settings.border--; Debug.WriteLine("Minus!"); break;
+                case Keys.W:
+                    controller.settings.decTop();
+                    Debug.WriteLine("Up!");
+                    break;
+                case Keys.S:
+                    controller.settings.incTop();
+                    Debug.WriteLine("Down!");
+                    break;
+                case Keys.A:
+                    controller.settings.decLeft();
+                    Debug.WriteLine("Left!");
+                    break;
+                case Keys.D:
+                    controller.settings.incLeft();
+                    Debug.WriteLine("Right!");
+                    break;
+                case Keys.Q:
+                    controller.settings.border++;
+                    Debug.WriteLine("Plus!");
+                    break;
+                case Keys.E:
+                    controller.settings.border--;
+                    Debug.WriteLine("Minus!");
+                    break;
             }
         }
 
@@ -236,7 +244,6 @@ namespace AForge.WindowsForms
 
         private void PlayButton_Click(object sender, EventArgs e)
         {
-
         }
     }
 }

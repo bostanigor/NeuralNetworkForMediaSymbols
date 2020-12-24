@@ -8,9 +8,6 @@ using System.Drawing;
 
 namespace AForge.WindowsForms
 {
-
-
-
     /// <summary>
     /// Класс-диспетчер, управляющий всеми остальными и служащий для связи с формой
     /// </summary>
@@ -22,13 +19,20 @@ namespace AForge.WindowsForms
         /// Возможные состояния - ожидание кадра, распознавание, анализ, движение.
         /// Их бы в какой-нибудь класс-диспетчер засунуть
         /// </summary>
-        enum Stage { Idle, Watching, Processing, Recognizing, Responding };
-        
+        enum Stage
+        {
+            Idle,
+            Watching,
+            Processing,
+            Recognizing,
+            Responding
+        };
+
         /// <summary>
         /// Текущее состояние
         /// </summary>
         private Stage currentState = Stage.Idle;
-        
+
         /// <summary>
         /// Это флажок для индикации от главной формы о том, что она уехала
         /// и не обещала вернуться - то есть когда закрывается, и оставьте себе свои картинки
@@ -42,7 +46,7 @@ namespace AForge.WindowsForms
         /// Анализатор изображения - выполняет преобразования изображения с камеры и сопоставление с шаблонами
         /// </summary>
         public MagicEye processor = new MagicEye();
-        
+
         /// <summary>
         /// Проверить, работает ли это
         /// </summary>
@@ -50,10 +54,7 @@ namespace AForge.WindowsForms
         public Settings settings
         {
             get { return processor.settings; }
-            set
-            {
-                processor.settings = value;
-            }
+            set { processor.settings = value; }
         }
 
         private bool _imageProcessed = true;
@@ -61,7 +62,10 @@ namespace AForge.WindowsForms
         /// <summary>
         /// Готов ли процессор к обработке нового изображения
         /// </summary>
-        public bool Ready { get { return _imageProcessed; } }
+        public bool Ready
+        {
+            get { return _imageProcessed; }
+        }
 
         /// <summary>
         /// Класс чтобы править ими всеми - и художником, и певцом, и мудрецом
@@ -71,7 +75,7 @@ namespace AForge.WindowsForms
         {
             formUpdateDelegate = updater;
         }
-        
+
         /// <summary>
         /// Задаёт изображение для обработки
         /// </summary>
@@ -112,8 +116,5 @@ namespace AForge.WindowsForms
         {
             return processor.processed;
         }
-
-
-
     }
 }

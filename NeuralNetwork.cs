@@ -12,7 +12,7 @@ using System.Collections;
 namespace AForge.WindowsForms
 {
     public enum FigureType
-    {        
+    {
         PLAY,
         STOP,
         PAUSE,
@@ -59,9 +59,9 @@ namespace AForge.WindowsForms
         public Sample(double[] inputValues, int classesCount, FigureType sampleClass = FigureType.UNDEF)
         {
             //  Клонируем массивчик
-            input = (double[])inputValues.Clone();
+            input = (double[]) inputValues.Clone();
             output = new double[classesCount];
-            if (sampleClass != FigureType.UNDEF) output[(int)sampleClass] = 1;
+            if (sampleClass != FigureType.UNDEF) output[(int) sampleClass] = 1;
 
             recognizedClass = FigureType.UNDEF;
             actualClass = sampleClass;
@@ -79,8 +79,8 @@ namespace AForge.WindowsForms
             recognizedClass = 0;
             for (int i = 0; i < output.Length; ++i)
             {
-                error[i] = ((i == (int)actualClass ? 1 : 0) - output[i]);
-                if (output[i] > output[(int)recognizedClass]) recognizedClass = (FigureType)i;
+                error[i] = ((i == (int) actualClass ? 1 : 0) - output[i]);
+                if (output[i] > output[(int) recognizedClass]) recognizedClass = (FigureType) i;
             }
         }
 
@@ -113,7 +113,7 @@ namespace AForge.WindowsForms
         /// <returns></returns>
         public override string ToString()
         {
-            string result = "Sample decoding : " + actualClass.ToString() + "(" + ((int)actualClass).ToString() +
+            string result = "Sample decoding : " + actualClass.ToString() + "(" + ((int) actualClass).ToString() +
                             "); " + Environment.NewLine + "Input : ";
             for (int i = 0; i < input.Length; ++i) result += input[i].ToString() + "; ";
             result += Environment.NewLine + "Output : ";
@@ -128,7 +128,7 @@ namespace AForge.WindowsForms
                 for (int i = 0; i < error.Length; ++i)
                     result += error[i].ToString() + "; ";
             result += Environment.NewLine + "Recognized : " + recognizedClass.ToString() + "(" +
-                      ((int)recognizedClass).ToString() + "); " + Environment.NewLine;
+                      ((int) recognizedClass).ToString() + "); " + Environment.NewLine;
 
             return result;
         }
@@ -137,7 +137,10 @@ namespace AForge.WindowsForms
         /// Правильно ли распознан образ
         /// </summary>
         /// <returns></returns>
-        public bool Correct() { return actualClass == recognizedClass; }
+        public bool Correct()
+        {
+            return actualClass == recognizedClass;
+        }
     }
 
     /// <summary>
@@ -159,7 +162,10 @@ namespace AForge.WindowsForms
             samples.Add(image);
         }
 
-        public int Count { get { return samples.Count; } }
+        public int Count
+        {
+            get { return samples.Count; }
+        }
 
         public IEnumerator GetEnumerator()
         {
@@ -182,7 +188,8 @@ namespace AForge.WindowsForms
             double correct = 0;
             double wrong = 0;
             foreach (var sample in samples)
-                if (sample.Correct()) ++correct; else ++wrong;
+                if (sample.Correct()) ++correct;
+                else ++wrong;
             return correct / (correct + wrong);
         }
 
@@ -192,6 +199,7 @@ namespace AForge.WindowsForms
     public class NeuralNetwork : BaseNetwork
     {
         static Random rand = new Random();
+
         private class NeuralNode
         {
             public double Value { get; set; }
@@ -216,6 +224,7 @@ namespace AForge.WindowsForms
                 this.nextLayer.Add(link);
                 next.prevLayer.Add(link);
             }
+
             public double Eval()
             {
                 double sum = EvalInputSum();
@@ -273,9 +282,7 @@ namespace AForge.WindowsForms
 
         public void Init(int[] structure)
         {
-            Func<double, double> func = (double x) => {
-                return 1 / (1 + System.Math.Exp(-x));
-            };
+            Func<double, double> func = (double x) => { return 1 / (1 + System.Math.Exp(-x)); };
 
 
             //  Creating layer structure
@@ -295,8 +302,8 @@ namespace AForge.WindowsForms
                 var nextLayer = nodeLayers[i + 1];
 
                 foreach (var node in currentLayer)
-                    foreach (var nextNode in nextLayer)
-                        node.LinkNextNode(nextNode);
+                foreach (var nextNode in nextLayer)
+                    node.LinkNextNode(nextNode);
             }
         }
 
@@ -317,10 +324,12 @@ namespace AForge.WindowsForms
 
                 ReevalWeights(sample);
             }
+
             throw new Exception("Too hard to train");
         }
 
-        public override double TrainOnDataSet(SamplesSet samplesSet, int epochs_count, double acceptable_erorr, bool parallel = true)
+        public override double TrainOnDataSet(SamplesSet samplesSet, int epochs_count, double acceptable_erorr,
+            bool parallel = true)
         {
             var stopWatch = new Stopwatch();
             stopWatch.Restart();
@@ -328,7 +337,7 @@ namespace AForge.WindowsForms
             for (int i = 1; i <= epochs_count; i++)
             {
                 foreach (var sample in samplesSet)
-                    if (Train((Sample)sample) == 0)
+                    if (Train((Sample) sample) == 0)
                         guessLevel += 1;
                 guessLevel /= samplesSet.samples.Count;
 
@@ -362,6 +371,7 @@ namespace AForge.WindowsForms
                 sample.processOutput();
                 if (sample.Correct()) correct += 1;
             }
+
             return correct / testSet.Count;
         }
 
@@ -388,8 +398,8 @@ namespace AForge.WindowsForms
         {
             //  Reset Errors
             foreach (var layer in nodeLayers)
-                foreach (var node in layer)
-                    node.Error = 0.0;
+            foreach (var node in layer)
+                node.Error = 0.0;
 
             //  Init errors on last layer
             var lastLayer = nodeLayers.Last();
@@ -397,8 +407,8 @@ namespace AForge.WindowsForms
                 lastLayer[i].Error = sample.error[i];
 
             foreach (var layer in nodeLayers.Reverse())
-                foreach (var node in layer)
-                    node.ReevalLinks(learningRate);
+            foreach (var node in layer)
+                node.ReevalLinks(learningRate);
         }
     }
 }

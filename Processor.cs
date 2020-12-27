@@ -315,13 +315,16 @@ namespace AForge.WindowsForms
 //                var newPath = fileName.Split('\\');
 //                newPath[newPath.Length - 1] = "processed_" + newPath.Last();
 //                image.Save(String.Join("\\", newPath));
-
                 var image = new Bitmap(fileName);
-                var inputs = new double[1000];
-                for (int i = 0; i < 500; i++)
+                var inputs = new double[400];
+                for (int i = 0; i < 20; i++)
                 {
-                    inputs[i] = CountBlackPixels(GetBitmapColumn(image, i));
-                    inputs[i + 500] = CountBlackPixels(GetBitmapRow(image, i));
+                    for (int j = 0; j < 20; j++)
+                    {
+                        inputs[20 * i + j] = CountInversionsInSquare(image, i, j);
+                    }
+                   // inputs[i] = CountBlackPixels(GetBitmapColumn(image, i));
+                   // inputs[i + 20] = CountBlackPixels(GetBitmapRow(image, i));
                 }
                 samplesSet.AddSample(new Sample(inputs, 5, type));
                 Console.WriteLine($"Add sample {fileName}");
@@ -330,18 +333,82 @@ namespace AForge.WindowsForms
         
         public Sample CreateSample(FigureType actualType = FigureType.UNDEF)
         {
-            var inputs = new double[1000];
-            for (int i = 0; i < 500; i++)
+            var inputs = new double[400];
+            for (int i = 0; i < 20; i++)
             {
-                inputs[i] = CountBlackPixels(GetBitmapColumn(processed, i));
-                inputs[i + 500] = CountBlackPixels(GetBitmapRow(processed, i));
+                for (int j = 0; j < 20; j++)
+                {
+                    inputs[20 * i + j] = CountInversionsInSquare(processed, i, j);
+                }
+                //inputs[i] = CountBlackPixels(GetBitmapColumn(processed, i));
+                //inputs[i + 500] = CountBlackPixels(GetBitmapRow(processed, i));
             }
 
             return new Sample(inputs, 5, actualType);
         }
 
-        public int CountBlackPixels(Color[] pixels) =>
-            pixels.Count(p => p.R < 0.1 && p.G < 0.1 && p.B < 0.1);
+
+        public int CountInversionsInSquare(Bitmap image, int row_ind, int col_ind)
+        {
+            int cnt_inv_row = 0;
+            int cnt_inv_col = 0;
+
+            int r = image.Width / 20;
+            int c = image.Height / 20;
+
+            // количество инверсий в строках
+            for (int i = r * row_ind; i < r * row_ind + r; i++)
+            {
+                Console.WriteLine(i.ToString() + " " + c + " "+ col_ind);
+                var pixel = image.GetPixel(i, c * col_ind);
+                bool black_seq = pixel.R < 0.1 && pixel.G < 0.1 && pixel.B < 0.1;
+                for (int j = c * col_ind + 1; j < c * col_ind + c; j++)
+                {
+                    pixel = image.GetPixel(i, j);
+                    bool black_pixel = pixel.R < 0.1 && pixel.G < 0.1 && pixel.B < 0.1;
+                    if (black_seq ^ black_pixel)
+                    {
+                        cnt_inv_row++;
+                        black_seq = !black_seq;
+                    }
+                }
+            }
+
+            // количество инверсий в столбцах
+            for (int j = c * col_ind; j < c * col_ind + c; j++)
+            {
+                var pixel = image.GetPixel(r * row_ind, j);
+                bool black_seq = pixel.R < 0.1 && pixel.G < 0.1 && pixel.B < 0.1;
+                for (int i = r * row_ind + 1; i < r * row_ind + r; i++)
+                {
+                    pixel = image.GetPixel(i, j);
+                    bool black_pixel = pixel.R < 0.1 && pixel.G < 0.1 && pixel.B < 0.1;
+                    if (black_seq ^ black_pixel)
+                    {
+                        cnt_inv_col++;
+                        black_seq = !black_seq;
+                    }
+                }
+            }
+            return cnt_inv_col + cnt_inv_row;
+        }
+
+        public int CountBlackPixels(Color[] pixels)
+        {
+            bool black_seq = pixels[0].R < 0.1 && pixels[0].G < 0.1 && pixels[0].B < 0.1;
+            int cnt_inv = 0;
+            for (int i = 1; i < pixels.Length; ++i)
+            {
+                bool black_pixel = pixels[i].R < 0.1 && pixels[i].G < 0.1 && pixels[i].B < 0.1;
+                if (black_seq ^ black_pixel)
+                {
+                    cnt_inv++;
+                    black_seq = !black_seq;
+                }
+            }
+            return cnt_inv;
+        }/*=>
+            pixels.Count(p => p.R < 0.1 && p.G < 0.1 && p.B < 0.1);*/
 
         public Color[] GetBitmapColumn(Bitmap picture, int ind)
         {
@@ -352,6 +419,21 @@ namespace AForge.WindowsForms
         }
 
         public Color[] GetBitmapRow(Bitmap picture, int ind)
+        {
+            var result = new Color[picture.Width];
+            for (int i = 0; i < picture.Width; i++)
+                result[i] = picture.GetPixel(i, ind);
+            return result;
+        }
+        public Color[] GetBitmapColumnIn(Bitmap picture, int ind, int row_ind, int col_ind)
+        {
+            var result = new Color[picture.Height];
+            for (int i = 0; i < picture.Height; i++)
+                result[i] = picture.GetPixel(ind, i);
+            return result;
+        }
+
+        public Color[] GetBitmapRowIn(Bitmap picture, int ind)
         {
             var result = new Color[picture.Width];
             for (int i = 0; i < picture.Width; i++)

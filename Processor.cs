@@ -310,12 +310,17 @@ namespace AForge.WindowsForms
         private void ProcessClassSamples(SamplesSet samplesSet, string[] fileNames, FigureType type)
         {
             foreach (var fileName in fileNames)
-            {                
-//                var image = getProcessedImage(new Bitmap(fileName));
-//                var newPath = fileName.Split('\\');
-//                newPath[newPath.Length - 1] = "processed_" + newPath.Last();
-//                image.Save(String.Join("\\", newPath));
+            {
+                //                var image = getProcessedImage(new Bitmap(fileName));
+                //                var newPath = fileName.Split('\\');
+                //                newPath[newPath.Length - 1] = "processed_" + newPath.Last();
+                //                image.Save(String.Join("\\", newPath));
                 var image = new Bitmap(fileName);
+                int left = findLeft(image);
+                int right = findRight(image);
+                int top = findTop(image);
+                int bottom = findBottom(image);
+                image = cropBitmap(image, left, top, right, bottom);
                 var inputs = new double[400];
                 for (int i = 0; i < 20; i++)
                 {
@@ -331,6 +336,89 @@ namespace AForge.WindowsForms
             }
         }
         
+        private int findLeft(Bitmap image)
+        {
+            int res = image.Width;
+            for (int i = 0; i < image.Height; ++i)
+            {
+                int j = 0;
+                var pixel = image.GetPixel(i, j);
+                while ((j < image.Width - 1) && pixel.R > 0.5 && pixel.G > 0.5 && pixel.B > 0.5)
+                {
+                    ++j;
+                    pixel = image.GetPixel(i, j);
+                }
+                if (pixel.R < 0.5 && pixel.G < 0.5 && pixel.B < 0.5 && j < res)
+                    res = j;
+            }
+            return res;
+        }
+        private int findRight(Bitmap image)
+        {
+            int res = 0;
+            for (int i = 0; i < image.Height; ++i)
+            {
+                int j = image.Width - 1;
+                var pixel = image.GetPixel(i, j);
+                while ((j > 0) && pixel.R > 0.5 && pixel.G > 0.5 && pixel.B > 0.5)
+                {
+                    --j;
+                    pixel = image.GetPixel(i, j);
+                }
+                if (pixel.R < 0.5 && pixel.G < 0.5 && pixel.B < 0.5 && j > res)
+                    res = j;
+            }
+            return res;
+        }
+        private int findTop(Bitmap image)
+        {
+            int res = image.Height;
+            for (int i = 0; i < image.Width; ++i)
+            {
+                int j = 0;
+                var pixel = image.GetPixel(j, i);
+                while ((j < image.Height - 1) && pixel.R > 0.5 && pixel.G > 0.5 && pixel.B > 0.5)
+                {
+                    ++j;
+                    pixel = image.GetPixel(j, i);
+                }
+                if (pixel.R < 0.5 && pixel.G < 0.5 && pixel.B < 0.5 && j < res)
+                    res = j;
+            }
+            return res;
+        }
+        private int findBottom(Bitmap image)
+        {
+            int res = 0;
+            for (int i = 0; i < image.Width; ++i)
+            {
+                int j = image.Height - 1;
+                var pixel = image.GetPixel(j, i);
+                while ((j > 0) && pixel.R > 0.5 && pixel.G > 0.5 && pixel.B > 0.5)
+                {
+                    --j;
+                    pixel = image.GetPixel(j, i);
+                }
+                if (pixel.R < 0.5 && pixel.G < 0.5 && pixel.B < 0.5 && j > res)
+                    res = j;
+            }
+            return res;
+        }
+        private Bitmap cropBitmap(Bitmap image, int left, int top, int right, int bottom)
+        {
+            Rectangle cropRect = new Rectangle(left, top, right, bottom);
+            Bitmap target = new Bitmap(cropRect.Width, cropRect.Height);
+
+            using (Graphics g = Graphics.FromImage(target))
+            {
+                g.DrawImage(image, new Rectangle(0, 0, target.Width, target.Height),
+                                 cropRect,
+                                 GraphicsUnit.Pixel);
+            }
+            return 
+        }
+
+
         public Sample CreateSample(FigureType actualType = FigureType.UNDEF)
         {
             var inputs = new double[400];

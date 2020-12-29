@@ -321,7 +321,7 @@ namespace AForge.WindowsForms
                 {
                     for (int j = 0; j < 20; j++)
                     {
-                        inputs[20 * i + j] = CountInversionsInSquare(image, i, j);
+                        inputs[20 * i + j] = CountBlackPixelsInSquare(image, i, j);
                     }
                    // inputs[i] = CountBlackPixels(GetBitmapColumn(image, i));
                    // inputs[i + 20] = CountBlackPixels(GetBitmapRow(image, i));
@@ -338,7 +338,7 @@ namespace AForge.WindowsForms
             {
                 for (int j = 0; j < 20; j++)
                 {
-                    inputs[20 * i + j] = CountInversionsInSquare(processed, i, j);
+                    inputs[20 * i + j] = CountBlackPixelsInSquare(processed, i, j);
                 }
                 //inputs[i] = CountBlackPixels(GetBitmapColumn(processed, i));
                 //inputs[i + 500] = CountBlackPixels(GetBitmapRow(processed, i));
@@ -348,9 +348,26 @@ namespace AForge.WindowsForms
         }
 
 
-        public int CountInversionsInSquare(Bitmap image, int row_ind, int col_ind)
+        public int CountBlackPixelsInSquare(Bitmap image, int row_ind, int col_ind)
         {
-            int cnt_inv_row = 0;
+            int r = image.Width / 20;
+            int c = image.Height / 20;
+
+            int cnt = 0;
+
+            for (int i = r * row_ind; i < r * row_ind + r; i++)
+            {
+                for (int j = c * col_ind; j < c * col_ind + c; j++)
+                {
+                    var pixel = image.GetPixel(i, j);
+                    bool black_pixel = pixel.R < 0.5 && pixel.G < 0.5 && pixel.B < 0.5;
+                    if (black_pixel)
+                        cnt++;
+                }
+            }
+            return cnt;
+
+            /*int cnt_inv_row = 0;
             int cnt_inv_col = 0;
 
             int r = image.Width / 20;
@@ -359,7 +376,6 @@ namespace AForge.WindowsForms
             // количество инверсий в строках
             for (int i = r * row_ind; i < r * row_ind + r; i++)
             {
-                Console.WriteLine(i.ToString() + " " + c + " "+ col_ind);
                 var pixel = image.GetPixel(i, c * col_ind);
                 bool black_seq = pixel.R < 0.1 && pixel.G < 0.1 && pixel.B < 0.1;
                 for (int j = c * col_ind + 1; j < c * col_ind + c; j++)
@@ -390,7 +406,7 @@ namespace AForge.WindowsForms
                     }
                 }
             }
-            return cnt_inv_col + cnt_inv_row;
+            return cnt_inv_col + cnt_inv_row;*/
         }
 
         public int CountBlackPixels(Color[] pixels)
